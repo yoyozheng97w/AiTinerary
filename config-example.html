@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>景點地圖搜尋器 - API 設定範例</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .code-block {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #007acc;
+            margin: 15px 0;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .step {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Google Maps API 設定指南</h1>
+    
+    <div class="warning">
+        <strong>⚠️ 重要提醒：</strong>
+        在實際使用前，您需要取得有效的 Google Maps API 金鑰並替換程式碼中的 `YOUR_API_KEY`。
+    </div>
+    
+    <h2>步驟 1：取得 API 金鑰</h2>
+    <div class="step">
+        <ol>
+            <li>前往 <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a></li>
+            <li>建立新專案或選擇現有專案</li>
+            <li>在左側選單中選擇「API 和服務」→「程式庫」</li>
+            <li>搜尋並啟用以下 API：
+                <ul>
+                    <li>Maps JavaScript API</li>
+                    <li>Geocoding API</li>
+                </ul>
+            </li>
+            <li>前往「API 和服務」→「憑證」</li>
+            <li>點擊「建立憑證」→「API 金鑰」</li>
+        </ol>
+    </div>
+    
+    <h2>步驟 2：設定 API 金鑰限制（建議）</h2>
+    <div class="step">
+        <ol>
+            <li>在憑證頁面點擊您剛建立的 API 金鑰</li>
+            <li>在「應用程式限制」中選擇「HTTP 參照網址」</li>
+            <li>添加您的網域（例如：localhost、您的網站網域）</li>
+            <li>在「API 限制」中選擇「限制金鑰」並只選擇需要的 API</li>
+            <li>點擊「儲存」</li>
+        </ol>
+    </div>
+    
+    <h2>步驟 3：更新程式碼</h2>
+    <p>將您的 API 金鑰替換到 <code>index.html</code> 文件中：</p>
+    
+    <div class="code-block">
+        <pre><code>&lt;!-- 將 YOUR_API_KEY 替換為您的實際 API 金鑰 --&gt;
+&lt;script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap"&gt;
+&lt;/script&gt;</code></pre>
+    </div>
+    
+    <h2>範例：</h2>
+    <div class="code-block">
+        <pre><code>&lt;script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1234567890abcdefghijklmnopqrstuvwxyz&callback=initMap"&gt;
+&lt;/script&gt;</code></pre>
+    </div>
+    
+    <h2>測試</h2>
+    <p>設定完成後，您可以測試以下景點：</p>
+    <ul>
+        <li>台北101</li>
+        <li>阿里山</li>
+        <li>日月潭</li>
+        <li>太魯閣</li>
+        <li>墾丁</li>
+    </ul>
+    
+    <div class="warning">
+        <strong>💡 提示：</strong>
+        <ul>
+            <li>API 金鑰是敏感資訊，請勿公開分享</li>
+            <li>建議設定 HTTP 參照網址限制以提高安全性</li>
+            <li>Google Maps API 有使用配額限制，請注意用量</li>
+        </ul>
+    </div>
+    
+    <p><a href="index.html">← 返回主頁面</a></p>
+</body>
+</html> 
