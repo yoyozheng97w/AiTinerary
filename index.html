@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>景點地圖搜尋器</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+    <!-- Google Maps API -->
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap">
+    </script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>景點地圖搜尋器</h1>
+            <p>輸入景點名稱，在地圖上查看位置</p>
+        </header>
+        
+        <div class="search-section">
+            <div class="search-box">
+                <input 
+                    type="text" 
+                    id="locationInput" 
+                    placeholder="請輸入景點名稱..."
+                    autocomplete="off"
+                >
+                <button id="searchBtn">搜尋</button>
+            </div>
+            <div id="loading" class="loading hidden">搜尋中...</div>
+        </div>
+        
+        <div class="map-container">
+            <div id="map"></div>
+            <div id="mapInfo" class="map-info hidden">
+                <h3 id="locationName"></h3>
+                <p id="locationAddress"></p>
+                <p id="locationCoords"></p>
+            </div>
+        </div>
+        
+        <div id="error" class="error hidden">
+            <p>無法找到該景點，請嘗試其他關鍵字</p>
+        </div>
+    </div>
+</body>
+</html> 
