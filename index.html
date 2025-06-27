@@ -6,10 +6,13 @@
     <title>景點地圖搜尋器</title>
     <link rel="stylesheet" href="styles.css">
     <script src="script.js" defer></script>
-    <!-- Google Maps API -->
-    <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDdnxUodKyPvCmQyJFc0nPJFUvtDOBfX1E&callback=initMap">
-
+    <script src="apikey.js"></script>
+    <script>
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&callback=initMap`;
+      script.async = true;
+      script.defer = true;
+      document.head.appendChild(script);
     </script>
 </head>
 <body>
@@ -21,13 +24,13 @@
         
         <div class="search-section">
             <div class="search-box">
-                <input 
-                    type="text" 
+                <textarea 
                     id="locationInput" 
-                    placeholder="請輸入景點名稱..."
-                    autocomplete="off"
-                >
-                <button id="searchBtn">搜尋</button>
+                    placeholder="請輸入多個景點，每行一個..."
+                    rows="4"
+                    style="resize:vertical;width:100%;font-size:1rem;padding:15px 20px;border:none;outline:none;">
+                </textarea>
+                <button id="searchBtn">規劃路線</button>
             </div>
             <div id="loading" class="loading hidden">搜尋中...</div>
         </div>

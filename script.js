@@ -3,6 +3,8 @@ let map;
 let marker;
 let geocoder;
 let infoWindow;
+let directionsService;
+let directionsRenderer;
 
 // 初始化地圖
 function initMap() {
@@ -27,6 +29,11 @@ function initMap() {
     
     geocoder = new google.maps.Geocoder();
     infoWindow = new google.maps.InfoWindow();
+    directionsService = new google.maps.DirectionsService();
+    directionsRenderer = new google.maps.DirectionsRenderer({
+        map: map,
+        suppressMarkers: false
+    });
     
     // 綁定事件
     bindEvents();
@@ -48,76 +55,73 @@ function bindEvents() {
 // 搜尋地點
 function searchLocation() {
     const locationInput = document.getElementById('locationInput');
-    const query = locationInput.value.trim();
-    
-    if (!query) {
-        showError('請輸入景點名稱');
+    const queries = locationInput.value.split('\n').map(s => s.trim()).filter(Boolean);
+    if (queries.length < 2) {
+        showError('請至少輸入兩個景點，每行一個');
         return;
     }
-    
     showLoading(true);
     hideError();
-    
-    // 使用 Geocoding API 搜尋地點
-    geocoder.geocode({ address: query }, (results, status) => {
-        showLoading(false);
-        
-        if (status === 'OK' && results[0]) {
-            const location = results[0].geometry.location;
-            const place = results[0];
-            
-            // 清除之前的標記
-            if (marker) {
-                marker.setMap(null);
+    // 依序 geocode
+    Promise.all(queries.map(q => geocodePlace(q))).then(results => {
+        if (results.some(r => !r)) {
+            showLoading(false);
+            showError('有景點無法找到，請檢查名稱');
+            return;
+        }
+        // 規劃路線
+        planRoute(results);
+    });
+}
+
+function geocodePlace(query) {
+    return new Promise(resolve => {
+        geocoder.geocode({ address: query }, (results, status) => {
+            if (status === 'OK' && results[0]) {
+                resolve({
+                    location: results[0].geometry.location,
+                    address: results[0].formatted_address
+                });
+            } else {
+                resolve(null);
             }
-            
-            // 創建新標記
-            marker = new google.maps.Marker({
-                map: map,
-                position: location,
-                title: place.formatted_address,
-                animation: google.maps.Animation.DROP
-            });
-            
-            // 設置地圖中心點和縮放級別
-            map.setCenter(location);
-            map.setZoom(15);
-            
-            // 顯示資訊視窗
-            const infoContent = `
-                <div style="padding: 10px;">
-                    <h3 style="margin: 0 0 5px 0; color: #333;">${place.formatted_address}</h3>
-                    <p style="margin: 0; color: #666; font-size: 12px;">
-                        經度: ${location.lng().toFixed(6)}<br>
-                        緯度: ${location.lat().toFixed(6)}
-                    </p>
-                </div>
-            `;
-            
-            infoWindow.setContent(infoContent);
-            infoWindow.open(map, marker);
-            
-            // 顯示地點資訊
-            showLocationInfo(place, location);
-            
+        });
+    });
+}
+
+function planRoute(places) {
+    // 第一個為起點，最後一個為終點，中間為途經點
+    const origin = places[0].location;
+    const destination = places[places.length - 1].location;
+    const waypoints = places.slice(1, -1).map(p => ({ location: p.location, stopover: true }));
+    directionsService.route({
+        origin,
+        destination,
+        waypoints,
+        travelMode: google.maps.TravelMode.DRIVING,
+        optimizeWaypoints: true
+    }, (result, status) => {
+        showLoading(false);
+        if (status === 'OK') {
+            directionsRenderer.setDirections(result);
+            showRouteInfo(result, places);
         } else {
-            showError('無法找到該景點，請嘗試其他關鍵字');
-            console.error('Geocoding failed:', status);
+            showError('路線規劃失敗，請稍後再試');
         }
     });
 }
 
-// 顯示地點資訊
-function showLocationInfo(place, location) {
+function showRouteInfo(result, places) {
+    // 顯示路線資訊，可擴充
     const mapInfo = document.getElementById('mapInfo');
-    const locationName = document.getElementById('locationName');
-    const locationAddress = document.getElementById('locationAddress');
-    const locationCoords = document.getElementById('locationCoords');
-    
-    locationName.textContent = place.formatted_address;
-    locationAddress.textContent = `地址: ${place.formatted_address}`;
-    locationCoords.textContent = `座標: ${location.lat().toFixed(6)}, ${location.lng().toFixed(6)}`;
-    
+    if (!result.routes[0]) return;
+    const route = result.routes[0];
+    let html = `<h3>最佳路線順序</h3><ol>`;
+    route.waypoint_order.forEach((idx, i) => {
+        html += `<li>${places[idx+1].address}</li>`;
+    });
+    html = `<li>${places[0].address}（起點）</li>` + html + `<li>${places[places.length-1].address}（終點）</li></ol>`;
+    mapInfo.innerHTML = html;
     mapInfo.classList.remove('hidden');
 }
 
